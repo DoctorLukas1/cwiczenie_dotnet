@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+WORKDIR /src
+
+COPY *.csproj ./
+RUN dotnet restore
+
+COPY . ./
+RUN dotnet publish -c realse -k /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build app/publish .
+
+ENV ASPNETCORE_URLS=http://+:9000
+EXPOSE 8080
+
+ENTRYPOINT [ "dotnet", "Api.dll" ]
